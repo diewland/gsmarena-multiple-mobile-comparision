@@ -1,0 +1,14 @@
+{
+  "name": "GSMArena mobile spec comparision",
+  "description": "",
+  "version": "1",
+  "app": {
+    "launch": {
+      "local_path": "main.html"
+    }
+  },
+ "permissions": [
+    "http://www.gsmarena.com/"
+  ]
+}
+

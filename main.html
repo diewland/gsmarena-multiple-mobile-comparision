@@ -1,0 +1,14 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script language="javascript">
+	var source = "http://www.gsmarena.com/quicksearch-4388.jpg";
+	$.ajax({
+		url: source,
+		success: function(data, textStatus, jqXHR){
+			var brands = data[0];
+			var models = data[1];
+			
+			var m = models[99];
+			var m_brand = brands[m[0]];
+		}
+	});
+</script>
