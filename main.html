@@ -5,7 +5,21 @@
 	$.ajax({
 		url: source,
 		success: function(data){
-			console.log(data);
+			var x = data
+			var y = $(x).find('#specs-list td');
+			$.each(y, function(i, data){
+				// console.log(data);
+				var clazz = $(data).attr('class');
+				var text = $(data).text();
+				if(clazz == 'ttl'){
+					console.log('===== ' + text + '=====');
+				}
+				else if(clazz == 'nfo'){
+					console.log(' >>> ' + text);
+				}
+			});
+
+			console.log('load complete');
 		},
 	});
 
