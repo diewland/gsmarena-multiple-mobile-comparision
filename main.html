@@ -1,5 +1,12 @@
+<input type='button' value='Add Phone' onclick='add_phone();' />
+<div id='output'>
+	Loading..
+</div>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script language="javascript">
+
+	function add_phone(){}
 
 	function get_data(url, callback){
 		var key = 'XXXXX';
@@ -24,15 +31,40 @@
 		});
 	}
 
+	function create_table( result, output_id ){
+		if(output_id == undefined){ output_id = 'output'; }
 
-	var url1 = "http://m.gsmarena.com/htc_one_x-4320.php";
-	get_data(url1, function(result){
-		for( k in result ){
-			// is load all ???
+		var table = '';
+		var gen_content = '';
+
+		for(k in result){
+			gen_content +=  "<tr>"
+							+ "<td>" + k + "</td>"
+							+ "<td>" + result[k] + "</td>"
+							+ "</tr>";
 		}
-	});
 
-	// if load all, render table from result
+		table = "<table id='" + output_id + "_table' border='1'>"
+					+ "<tr>"
+						+ "<td>FIELD</td><td>PHONE I</td>"
+						+ gen_content
+					+ "</tr>"
+				+ "</table>";
+
+		// render to screen
+		$('#'+output_id).html(table);
+	}
+
+
+	// -----------------------------------------------------------------
+
+	
+	var url1 = "http://m.gsmarena.com/htc_one_x-4320.php";
+	var url2 = "http://m.gsmarena.com/htc_one_x-4320.php";
+
+	// start from url1
+	get_data(url1, function(result){ create_table( result ); });
+
 
 	// -----------------------------------------------------------------
 
