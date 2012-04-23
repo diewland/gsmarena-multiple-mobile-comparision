@@ -1,8 +1,16 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script language="javascript">
 
-	var source = "http://www.gsmarena.com/quicksearch-4388.jpg";
+	var source = "http://m.gsmarena.com/htc_one_x-4320.php";
+	$.ajax({
+		url: source,
+		success: function(data){
+			console.log(data);
+		},
+	});
 
+	/*
+	var source = "http://www.gsmarena.com/quicksearch-4388.jpg";
 	$.ajax({
 		url: source,
 		success: function(data, textStatus, jqXHR){
@@ -24,5 +32,7 @@
 			console.log(m_img);
 		}
 	});
+	*/
+
 </script>
 <input type='text' id='txt1' />
