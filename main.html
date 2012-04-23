@@ -1,27 +1,40 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script language="javascript">
 
-	var source = "http://m.gsmarena.com/htc_one_x-4320.php";
-	$.ajax({
-		url: source,
-		success: function(data){
-			var x = data
-			var y = $(x).find('#specs-list td');
-			$.each(y, function(i, data){
-				// console.log(data);
-				var clazz = $(data).attr('class');
-				var text = $(data).text();
-				if(clazz == 'ttl'){
-					console.log('===== ' + text + '=====');
-				}
-				else if(clazz == 'nfo'){
-					console.log(' >>> ' + text);
-				}
-			});
+	function get_data(url, callback){
+		var key = 'XXXXX';
+		var result = {};
+		$.ajax({
+			url: url,
+			success: function(data){
+				var tds = $(data).find('#specs-list td');
+				$.each(tds, function(i, d){
+					var clazz = $(d).attr('class');
+					var text = $(d).text();
+					if(clazz == 'ttl'){
+						key = text;
+					}
+					else if(clazz == 'nfo'){
+						result[key] = text;
+					}
+				});
+				console.log(url + ' : OK');
+				callback(result);
+			},
+		});
+	}
 
-			console.log('load complete');
-		},
+
+	var url1 = "http://m.gsmarena.com/htc_one_x-4320.php";
+	get_data(url1, function(result){
+		for( k in result ){
+			// is load all ???
+		}
 	});
+
+	// if load all, render table from result
+
+	// -----------------------------------------------------------------
 
 	/*
 	var source = "http://www.gsmarena.com/quicksearch-4388.jpg";
@@ -49,4 +62,3 @@
 	*/
 
 </script>
-<input type='text' id='txt1' />
