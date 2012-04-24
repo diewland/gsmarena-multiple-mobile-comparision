@@ -1,32 +1,48 @@
+<style type='text/css'>
+	* {
+		color: lime;
+		font: 14px 'Courier New';
+		background-color: #000;
+	}
+</style>
 <input type='button' value='Add Phone' onclick='add_phone();' />
-<div id='output'>
-	Loading..
-</div>
+<span id='loading'></span>
+<div id='output'></div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <script language="javascript">
 
-	function add_phone(){}
+	function fetch_data(url){
+		loading_start();
 
-	function get_data(url, callback){
 		var key = 'XXXXX';
 		var result = {};
 		$.ajax({
 			url: url,
 			success: function(data){
+
+				// TODO manual add
+				result['Phone'] = 'PHONE NAME';
+				result['Image'] = '<img src="http://st2.gsmarena.com/vv/bigpic/htc-one-s-new.jpg" />';
+
+				// gather data
 				var tds = $(data).find('#specs-list td');
 				$.each(tds, function(i, d){
 					var clazz = $(d).attr('class');
 					var text = $(d).text();
 					if(clazz == 'ttl'){
 						key = text;
+						// hot fix
+						if(key.trim() == ''){ key = 'Battery'; }
 					}
 					else if(clazz == 'nfo'){
 						result[key] = text;
 					}
 				});
-				console.log(url + ' : OK');
-				callback(result);
+
+				// generate table
+				create_table(result);
+				loading_end();
 			},
 		});
 	}
@@ -34,37 +50,60 @@
 	function create_table( result, output_id ){
 		if(output_id == undefined){ output_id = 'output'; }
 
+		RESULTS.push( result );
+
+		// get keys
+		var keys = [];
+		for(k in result){ keys.push( k ); }
+
 		var table = '';
 		var gen_content = '';
 
-		for(k in result){
-			gen_content +=  "<tr>"
-							+ "<td>" + k + "</td>"
-							+ "<td>" + result[k] + "</td>"
-							+ "</tr>";
+		// loop by keys
+		for(var i=0; i<keys.length; i++){
+			var k = keys[i];
+			gen_content +=  "<tr><td>" + k + "</td>";
+			// loop by results
+			for(var j=0; j<RESULTS.length; j++){
+				var r = RESULTS[j];
+				gen_content += "<td>" + r[k] + "</td>"
+			}
+			gen_content +=  "</tr>";
 		}
 
+		// concat table html
 		table = "<table id='" + output_id + "_table' border='1'>"
-					+ "<tr>"
-						+ "<td>FIELD</td><td>PHONE I</td>"
+					// + "<tr>"
+					//	+ "<td>FIELD</td><td>PHONE I</td>"
 						+ gen_content
-					+ "</tr>"
+					// + "</tr>"
 				+ "</table>";
 
 		// render to screen
 		$('#'+output_id).html(table);
 	}
 
+	function loading_start(){
+		$('#loading').html("<img src='ajax-loader.gif' />");
+	}
+	function loading_end(){
+		$('#loading').html("");
+	}
 
 	// -----------------------------------------------------------------
 
-	
+	// GLOBAL VAR
+	var RESULTS = []; // <--- link with create_table
+
+	// test url
 	var url1 = "http://m.gsmarena.com/htc_one_x-4320.php";
-	var url2 = "http://m.gsmarena.com/htc_one_x-4320.php";
+	var url2 = "http://m.gsmarena.com/htc_one_s-4574.php";
 
 	// start from url1
-	get_data(url1, function(result){ create_table( result ); });
+	// fetch_data(url1);
 
+	// test function
+	function add_phone(){ fetch_data(url2); }
 
 	// -----------------------------------------------------------------
 
