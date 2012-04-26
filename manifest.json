@@ -7,6 +7,10 @@
       "local_path": "main.html"
     }
   },
+  "icons": {
+	"16": "icon128.png",
+	"128": "icon128.png"
+  },
  "permissions": [
     "http://*.gsmarena.com/"
   ]
