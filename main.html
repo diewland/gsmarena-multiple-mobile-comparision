@@ -1,15 +1,21 @@
 <style type='text/css'>
 	* {
-		color: lime;
-		font: 14px 'Courier New';
+		/*
+		color: #CCC;
+		font: 12px 'Tahoma';
 		background-color: #000;
+		*/
 	}
 </style>
-<input type='button' value='Add Phone' onclick='add_phone();' />
+<title>Mobile comparator, powered by GSMArena.com</title>
+<select id='combo_mobile'>
+	<option value='loading'>Building phone list...</option>
+</select>
+<input style='display: none;' type='button' id='add_phone' value='Add Phone' onclick='add_phone();' />
 <span id='loading'></span>
 <div id='output'></div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script src="jquery.min.1.6.1.js"></script>
 <script language="javascript">
 
 	function fetch_data(url){
@@ -19,11 +25,18 @@
 		var result = {};
 		$.ajax({
 			url: url,
+			error:function(a, b, c){
+				alert(a.status + '\n' + c);
+				loading_end();
+			},
 			success: function(data){
 
+				var phone_name = $(data).find('h1').text();
+				var img_src = $(data).find('div#specs-cp-pic img').attr('src');
+
 				// TODO manual add
-				result['Phone'] = 'PHONE NAME';
-				result['Image'] = '<img src="http://st2.gsmarena.com/vv/bigpic/htc-one-s-new.jpg" />';
+				result['Phone'] = phone_name;
+				result['Image'] = '<img src="' + img_src + '" />';
 
 				// gather data
 				var tds = $(data).find('#specs-list td');
@@ -90,46 +103,69 @@
 		$('#loading').html("");
 	}
 
+	function load_combo(){
+		loading_start();
+
+		var source = "http://www.gsmarena.com/quicksearch-4388.jpg"; // mobile list
+		$.ajax({
+			url: source,
+			success: function(data, textStatus, jqXHR){
+				var brands = data[0];
+				var models = data[1];
+				var combo_data = {};
+				var combo_data2 = {};
+				for(var i=0; i<models.length; i++){
+					var m = models[i];
+					var m_brand	= brands[m[0]];
+					var m_id	= m[1];
+					var m_name	= m[2];
+					var m_name2	= m[3];
+					var m_img	= m[4];
+					var key = m_brand + ' ' + m_name;
+					var page_name = (m_brand + '_' + m_name.replace(/ /g, '_') + '-' + m_id).toLowerCase();
+					var value = 'http://www.gsmarena.com/' + page_name + '.php';
+					combo_data[key] = value;
+				}
+
+				// sort data
+				keys = [];
+				for(var k in combo_data) {
+					if (combo_data.hasOwnProperty(k)) {
+						keys.push(k);
+					}
+				}
+				keys.sort();
+				for(var i=0; i<keys.length; i++){
+					combo_data2[keys[i]] = combo_data[keys[i]];
+				}
+				
+				// update combo box
+				$.each(combo_data2, function(key, value){
+					$('#combo_mobile')
+						.append(
+							$('<option></option>')
+							.text(key)
+							.attr('value', value)
+						);
+				});
+
+				// after loaded
+				loading_end();
+				$("#combo_mobile option[value='loading']").remove();
+				$('#add_phone').css('display', 'inline');
+			}
+		});
+	}
+
+	function add_phone(){
+		var url = $('#combo_mobile').val();
+		fetch_data(url);
+	}
+
 	// -----------------------------------------------------------------
 
 	// GLOBAL VAR
-	var RESULTS = []; // <--- link with create_table
-
-	// test url
-	var url1 = "http://m.gsmarena.com/htc_one_x-4320.php";
-	var url2 = "http://m.gsmarena.com/htc_one_s-4574.php";
-
-	// start from url1
-	// fetch_data(url1);
-
-	// test function
-	function add_phone(){ fetch_data(url2); }
-
-	// -----------------------------------------------------------------
-
-	/*
-	var source = "http://www.gsmarena.com/quicksearch-4388.jpg";
-	$.ajax({
-		url: source,
-		success: function(data, textStatus, jqXHR){
-			var brands = data[0];
-			var models = data[1];
-			
-			var m = models[4]; // --- test
-
-			var m_brand	= brands[m[0]];
-			var m_id	= m[1];
-			var m_name	= m[2];
-			var m_name2	= m[3];
-			var m_img	= m[4];
-
-			console.log(m_brand);
-			console.log(m_id);
-			console.log(m_name);
-			console.log(m_name2);
-			console.log(m_img);
-		}
-	});
-	*/
+	var RESULTS = []; // link with create_table function
+	load_combo();
 
 </script>
