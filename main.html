@@ -9,18 +9,33 @@
 	.hilight { background-color: #FFCC33; }
 </style>
 <title>GSMArena mobile comparator</title>
-<input type='text' id='text_mobile' />
+<input style='display: none;' type='text' id='text_mobile' />
 <input style='display: none;' type='button' id='add_phone' value='Add Phone' onclick='add_phone();' />
+<span id='status'>Building mobile list..</span>
 <span id='loading'></span>
 <div id='output'></div>
 
-<script src="jquery.min.1.6.1.js"></script>
-
-<!-- TODO external libs -->
+<!-- jquery libs -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
 <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
 
 <script language="javascript">
+
+	function remove(obj){
+		var column_index = $(obj).closest('td').prevAll('td').length;
+		// remove from result
+		RESULTS.splice(column_index-1, 1);
+		// remove column
+		var cols = $('#output_table tr').eq(0).find('td').length;
+		if(cols <= 2){
+			$('#output').html('');
+		}
+		else {
+			$.each($('#output_table tr'), function(){ $(this).find('td').eq(column_index).remove(); });
+		}
+		$('#text_mobile').focus();
+	}
 
 	function fetch_data(url){
 		loading_start();
@@ -31,12 +46,20 @@
 			url: url,
 			error:function(a, b, c){
 				alert(a.status + '\n' + c);
+				$('#text_mobile').val('');
+				$('#text_mobile').focus();
 				loading_end();
 			},
 			success: function(data){
 
 				var phone_name = $(data).find('h1').text();
 				var img_src = $(data).find('div#specs-cp-pic img').attr('src');
+
+				// control bar
+				var panel = "" // "<input type='button' value='<==' />"
+							+ "<input type='button' value=' X ' onclick='remove(this);' />";
+							// + "<input type='button' value='==>' />";
+				result['Controller'] = panel;
 
 				// manual add
 				desktop_url = url.replace(/m\./, 'www\.');
@@ -148,6 +171,8 @@
 
 				// after loaded
 				loading_end();
+				$('#status').css('display', 'none');
+				$('#text_mobile').css('display', 'inline');
 				$('#text_mobile').focus();
 				$('#add_phone').css('display', 'inline');
 			}
