@@ -1,7 +1,7 @@
 {
-  "name": "GSMArena mobile spec comparision",
+  "name": "GSMArena mobile comparator",
   "description": "",
-  "version": "1",
+  "version": "1.1",
   "app": {
     "launch": {
       "local_path": "main.html"
