@@ -6,16 +6,20 @@
 		background-color: #000;
 		*/
 	}
+	.hilight { background-color: #FFCC33; }
 </style>
 <title>Mobile comparator, powered by GSMArena.com</title>
-<select id='combo_mobile'>
-	<option value='loading'>Building phone list...</option>
-</select>
+<input type='text' id='text_mobile' />
 <input style='display: none;' type='button' id='add_phone' value='Add Phone' onclick='add_phone();' />
 <span id='loading'></span>
 <div id='output'></div>
 
 <script src="jquery.min.1.6.1.js"></script>
+
+<!-- TODO external libs -->
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css"/>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+
 <script language="javascript">
 
 	function fetch_data(url){
@@ -34,9 +38,10 @@
 				var phone_name = $(data).find('h1').text();
 				var img_src = $(data).find('div#specs-cp-pic img').attr('src');
 
-				// TODO manual add
-				result['Phone'] = phone_name;
-				result['Image'] = '<img src="' + img_src + '" />';
+				// manual add
+				desktop_url = url.replace(/m\./, 'www\.');
+				result['Phone'] = phone_name + " [ <a href='"+ desktop_url +"' target='_blank'>Go to GSMArena</a> ]";
+				result['Image'] = '<a href="'+ desktop_url +'" target="_blank"><img src="' + img_src + '" border="0" /></a>';
 
 				// gather data
 				var tds = $(data).find('#specs-list td');
@@ -56,6 +61,8 @@
 				// generate table
 				create_table(result);
 				loading_end();
+				$('#text_mobile').val('');
+				$('#text_mobile').focus();
 			},
 		});
 	}
@@ -94,6 +101,10 @@
 
 		// render to screen
 		$('#'+output_id).html(table);
+		$('#'+output_id+' tr').hover(
+			function(){ $(this).addClass('hilight'); },
+			function(){ $(this).removeClass('hilight'); }
+		);
 	}
 
 	function loading_start(){
@@ -103,7 +114,7 @@
 		$('#loading').html("");
 	}
 
-	function load_combo(){
+	function initial(){
 		loading_start();
 
 		var source = "http://www.gsmarena.com/quicksearch-4388.jpg"; // mobile list
@@ -112,8 +123,6 @@
 			success: function(data, textStatus, jqXHR){
 				var brands = data[0];
 				var models = data[1];
-				var combo_data = {};
-				var combo_data2 = {};
 				for(var i=0; i<models.length; i++){
 					var m = models[i];
 					var m_brand	= brands[m[0]];
@@ -123,42 +132,30 @@
 					var m_img	= m[4];
 					var key = m_brand + ' ' + m_name;
 					var page_name = (m_brand + '_' + m_name.replace(/ /g, '_') + '-' + m_id).toLowerCase();
-					var value = 'http://www.gsmarena.com/' + page_name + '.php';
-					combo_data[key] = value;
+					var value = 'http://m.gsmarena.com/' + page_name + '.php';
+					MOBILES_DATA[key] = value;
 				}
 
-				// sort data
+				// make autocomplete
 				keys = [];
-				for(var k in combo_data) {
-					if (combo_data.hasOwnProperty(k)) {
+				for(var k in MOBILES_DATA) {
+					if (MOBILES_DATA.hasOwnProperty(k)) {
 						keys.push(k);
 					}
 				}
 				keys.sort();
-				for(var i=0; i<keys.length; i++){
-					combo_data2[keys[i]] = combo_data[keys[i]];
-				}
-				
-				// update combo box
-				$.each(combo_data2, function(key, value){
-					$('#combo_mobile')
-						.append(
-							$('<option></option>')
-							.text(key)
-							.attr('value', value)
-						);
-				});
+				$('#text_mobile').autocomplete({ source: keys });
 
 				// after loaded
 				loading_end();
-				$("#combo_mobile option[value='loading']").remove();
+				$('#text_mobile').focus();
 				$('#add_phone').css('display', 'inline');
 			}
 		});
 	}
 
 	function add_phone(){
-		var url = $('#combo_mobile').val();
+		var url = MOBILES_DATA[$('#text_mobile').val()];
 		fetch_data(url);
 	}
 
@@ -166,6 +163,7 @@
 
 	// GLOBAL VAR
 	var RESULTS = []; // link with create_table function
-	load_combo();
+	var MOBILES_DATA = {};
+	initial();
 
 </script>
