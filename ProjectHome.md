@@ -1,0 +1,1 @@
+compare more than 2 mobiles from gsmarena.com
